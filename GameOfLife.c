@@ -14,10 +14,10 @@ int main (int argc, char* argv[])
   int *right_ghost;
   int *top_ghost;
   int *bottom_ghost;
-  
+  int num_live_cells = 0;
   int t_step = 10; // t_step is the total time iterations in game of life
   int i, j;
-  int t;		  // t is time variable used to indicate the nth generation in game of life
+  int t = 0;		  // t is time variable used to indicate the nth generation in game of life
   if (argc != 2)
   {
 	  printf("usage error: provide array size as input to parameter. Format <executable> <array_size> where array_size is integer \n");
@@ -220,32 +220,18 @@ int main (int argc, char* argv[])
 			  bottomright = array2d_old[i+1][j+1];
 		  }
 		  // count number of live cells
-		  if (top == 1)
-			neighbor_live_cell_cnt++;
-		  if (bottom == 1)
-			neighbor_live_cell_cnt++;
-		  if (left == 1)
-			neighbor_live_cell_cnt++;
-		  if (right == 1)
-			neighbor_live_cell_cnt++;
-		  if (topleft == 1)
-			neighbor_live_cell_cnt++;
-		  if (topright == 1)
-			neighbor_live_cell_cnt++;
-		  if (bottomleft == 1)
-			neighbor_live_cell_cnt++;
-		  if (bottomright == 1)
-			neighbor_live_cell_cnt++;
+		  neighbor_live_cell_cnt = top + bottom + left + right + topleft + topright + bottomleft + bottomright;
+		  
+		  switch (neighbor_live_cell_cnt)
+		  {
+			// if three live cell neighbours then cell is alive
+			case 3: array2d_new[i][j] = 1; break;			
+			// if two live cell neighbours then there is no change 
+			case 2: array2d_new[i][j] = array2d_old[i][j]; break;
+			// all other cases, the cell becomes dead
+			default: array2d_new[i][j] = 0; break;
 			
-		  // if three live cell neighbours then cell is alive
-		  if (neighbor_live_cell_cnt == 3)
-			array2d_new[i][j] = 1;
-		  // if two live cell neighbours then there is no change 
-		  else if(neighbor_live_cell_cnt == 2)
-			array2d_new[i][j] = array2d_old[i][j];
-		  // all other cases, the cell becomes dead
-		  else
-			array2d_new[i][j] = 0;		  
+		  }
 		}
 	  }
 	  printf("\033[0;37m Time Iteration = %d\n \033[37m", t+1);
@@ -287,7 +273,16 @@ int main (int argc, char* argv[])
 	  
 	  t++;
 	}
-  
+    
+	for (i = 0; i < array_size; i++)
+	{
+	  for (j = 0; j < array_size; j++)
+	  {
+	    if (array2d_new[i][j] == 1)
+		  num_live_cells++;
+	  }
+	}
+	printf("Total Live cells : %d after %d iterations\n", num_live_cells,t_step);
   return 0;
 }
 
